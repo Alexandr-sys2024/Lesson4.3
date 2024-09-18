@@ -141,3 +141,110 @@ if __name__ == "__main__":
     zoo.list_animals()
     zoo.list_employees()
 
+import pickle
+
+# Класс Animal для представления животных
+class Animal:
+    def __init__(self, name, species, age):
+        self.name = name
+        self.species = species
+        self.age = age
+
+    def __str__(self):
+        return f"{self.name}, {self.species}, возраст: {self.age}"
+
+# Базовый класс Employee для всех сотрудников зоопарка
+class Employee:
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return f"Сотрудник: {self.name}"
+
+# Подкласс ZooKeeper (Смотритель зоопарка)
+class ZooKeeper(Employee):
+    def feed_animal(self, animal: Animal):
+        print(f"{self.name} кормит {animal.name}, которое является {animal.species}.")
+
+# Подкласс Veterinarian (Ветеринар)
+class Veterinarian(Employee):
+    def heal_animal(self, animal: Animal):
+        print(f"{self.name} лечит {animal.name}, которое является {animal.species}.")
+
+# Класс Zoo для управления животными и сотрудниками (композиция)
+class Zoo:
+    def __init__(self, name):
+        self.name = name
+        self.animals = []   # Список для хранения животных
+        self.employees = [] # Список для хранения сотрудников
+
+    # Метод для добавления животных
+    def add_animal(self, animal):
+        self.animals.append(animal)
+        print(f"Животное {animal.name} добавлено в зоопарк.")
+
+    # Метод для добавления сотрудников
+    def add_employee(self, employee):
+        self.employees.append(employee)
+        print(f"Сотрудник {employee.name} добавлен в зоопарк.")
+
+    # Метод для отображения всех животных
+    def show_animals(self):
+        print("\nЖивотные в зоопарке:")
+        for animal in self.animals:
+            print(animal)
+
+    # Метод для отображения всех сотрудников
+    def show_employees(self):
+        print("\nСотрудники зоопарка:")
+        for employee in self.employees:
+            print(employee)
+
+    # Метод для сохранения состояния зоопарка в файл
+    def save_to_file(self, filename):
+        with open(filename, 'wb') as f:
+            pickle.dump(self, f)
+        print(f"Зоопарк сохранен в файл '{filename}'.")
+
+    # Метод для загрузки состояния зоопарка из файла
+    @staticmethod
+    def load_from_file(filename):
+        try:
+            with open(filename, 'rb') as f:
+                zoo = pickle.load(f)
+            print(f"Зоопарк загружен из файла '{filename}'.")
+            return zoo
+        except FileNotFoundError:
+            print(f"Файл '{filename}' не найден. Создается новый зоопарк.")
+            return Zoo("Новый зоопарк")
+
+
+# Пример использования
+if __name__ == "__main__":
+    # Пытаемся загрузить зоопарк из файла или создаем новый
+    zoo = Zoo.load_from_file("zoo_state.pkl")
+
+    # Добавляем животных (если нужно)
+    if not zoo.animals:
+        animal1 = Animal("Лев", "Хищник", 5)
+        animal2 = Animal("Зебра", "Травоядное", 3)
+        zoo.add_animal(animal1)
+        zoo.add_animal(animal2)
+
+    # Добавляем сотрудников (если нужно)
+    if not zoo.employees:
+        zookeeper = ZooKeeper("Андрей")
+        veterinarian = Veterinarian("Мария")
+        zoo.add_employee(zookeeper)
+        zoo.add_employee(veterinarian)
+
+    # Вывод информации
+    zoo.show_animals()
+    zoo.show_employees()
+
+    # Специфические методы для сотрудников
+    zookeeper.feed_animal(zoo.animals[0])    # Смотритель кормит животное
+    veterinarian.heal_animal(zoo.animals[1]) # Ветеринар лечит животное
+
+    # Сохранение состояния зоопарка в файл
+    zoo.save_to_file("zoo_state.pkl")
