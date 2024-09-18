@@ -202,49 +202,52 @@ class Zoo:
 
     # Метод для сохранения состояния зоопарка в файл
     def save_to_file(self, filename):
-        with open(filename, 'wb') as f:
-            pickle.dump(self, f)
-        print(f"Зоопарк сохранен в файл '{filename}'.")
+        with open(filename, 'wb') as file:
+            pickle.dump(self, file)
+        print(f"Информация о зоопарке '{self.name}' сохранена в файл '{filename}'.")
 
-    # Метод для загрузки состояния зоопарка из файла
+    # Статический метод для загрузки состояния зоопарка из файла
     @staticmethod
     def load_from_file(filename):
         try:
-            with open(filename, 'rb') as f:
-                zoo = pickle.load(f)
-            print(f"Зоопарк загружен из файла '{filename}'.")
-            return zoo
+            with open(filename, 'rb') as file:
+                zoo = pickle.load(file)
+                print(f"Информация о зоопарке загружена из файла '{filename}'.")
+                return zoo
         except FileNotFoundError:
             print(f"Файл '{filename}' не найден. Создается новый зоопарк.")
-            return Zoo("Новый зоопарк")
-
+            return None
 
 # Пример использования
 if __name__ == "__main__":
-    # Пытаемся загрузить зоопарк из файла или создаем новый
-    zoo = Zoo.load_from_file("zoo_state.pkl")
+    # Попробуем загрузить зоопарк из файла, если он существует
+    filename = "zoo_data.pkl"
+    zoo = Zoo.load_from_file(filename)
 
-    # Добавляем животных (если нужно)
+    # Если зоопарк не был найден в файле, создаем новый
+    if zoo is None:
+        zoo = Zoo("Зоопарк города")
+
+    # Добавляем животных и сотрудников только если их еще нет
     if not zoo.animals:
         animal1 = Animal("Лев", "Хищник", 5)
         animal2 = Animal("Зебра", "Травоядное", 3)
         zoo.add_animal(animal1)
         zoo.add_animal(animal2)
 
-    # Добавляем сотрудников (если нужно)
     if not zoo.employees:
         zookeeper = ZooKeeper("Андрей")
         veterinarian = Veterinarian("Мария")
         zoo.add_employee(zookeeper)
         zoo.add_employee(veterinarian)
 
-    # Вывод информации
+    # Выводим текущие данные зоопарка
     zoo.show_animals()
     zoo.show_employees()
 
-    # Специфические методы для сотрудников
-    zookeeper.feed_animal(zoo.animals[0])    # Смотритель кормит животное
-    veterinarian.heal_animal(zoo.animals[1]) # Ветеринар лечит животное
+    # Пример использования специфических методов сотрудников
+    zookeeper.feed_animal(animal1)    # Смотритель кормит животное
+    veterinarian.heal_animal(animal2) # Ветеринар лечит животное
 
-    # Сохранение состояния зоопарка в файл
-    zoo.save_to_file("zoo_state.pkl")
+    # Сохраняем текущее состояние зоопарка в файл
+    zoo.save_to_file(filename)
