@@ -78,6 +78,16 @@ class Employee:
     def __str__(self):
         return f"{self.name}, должность: {self.position}"
 
+# Подкласс ZooKeeper (Смотритель зоопарка)
+class ZooKeeper(Employee):
+    def feed_animal(self, animal: Animal):
+        print(f"{self.name} кормит {animal.name}, которое является {animal.species}.")
+
+# Подкласс Veterinarian (Ветеринар)
+class Veterinarian(Employee):
+    def heal_animal(self, animal: Animal):
+        print(f"{self.name} лечит {animal.name}, которое является {animal.species}.")
+
 # Класс Zoo для управления животными и сотрудниками
 class Zoo:
     def __init__(self, name):
